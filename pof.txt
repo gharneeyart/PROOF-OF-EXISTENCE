@@ -1,0 +1,14 @@
+CONTRACT 2: Enhanced Proof of Existence Registry   [Intermediate]
+Build a document registry that proves documents existed at a specific time and tracks metadata. This tests structs, mappings, arrays, hashing, and events together. Real use case: legal documents, IP registration, supply chain records.
+Requirements:
+	•	Struct: Document { bytes32 docHash; address submitter; uint256 timestamp; uint256 blockNumber; string description; bool revoked; }
+	•	State: mapping(bytes32 => Document) private registry; bytes32[] private allDocHashes; mapping(address => bytes32[]) private submitterDocuments; uint256 public documentCount;
+	•	notarize(bytes32 docHash, string calldata description): require not already registered (timestamp == 0). Store Document struct. Push to allDocHashes. Push to submitterDocuments[msg.sender]. Increment count. Emit Notarized(docHash, msg.sender, block.timestamp).
+	•	notarizeString(string calldata rawContent): compute hash = keccak256(abi.encodePacked(rawContent)). Call internal notarize logic. Return the computed hash.
+	•	verify(bytes32 docHash): external view. Return the full Document struct.
+	•	isNotarized(bytes32 docHash): external view. Return bool (timestamp != 0 and not revoked).
+	•	revoke(bytes32 docHash): only the original submitter (check registry[docHash].submitter == msg.sender). Set revoked = true. Emit Revoked(docHash, msg.sender).
+	•	getDocsBySubmitter(address submitter): external view. Return bytes32[] of all doc hashes from that submitter.
+	•	Custom error: error AlreadyNotarized(bytes32 docHash, address originalSubmitter, uint256 timestamp)
+
+Concepts Tested: structs, nested mappings, bytes32 arrays, keccak256 hashing, abi.encodePacked, custom errors, view functions, caller-restricted operations, block.timestamp/number
